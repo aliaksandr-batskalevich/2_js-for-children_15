@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>KeyBoardEvents</title>
+</head>
+<body>
+<canvas id="canvas" width="400" height="400"></canvas>
+<script src="https://code.jquery.com/jquery-2.1.0.js"></script>
+<script>
+    var canvas = document.getElementById("canvas")
+    var ctx = canvas.getContext("2d");
+    var width = canvas.width;
+    var height = canvas.height;
+
+    function circle(x, y, radius, fill) {
+        ctx.beginPath();
+        ctx.arc(x, y, radius, 0, Math.PI * 2, false);
+        if (fill === "fill") {
+            ctx.fill();
+        } else if (fill === "stroke") {
+            ctx.stroke();
+        }
+    }
+
+    function Ball() {
+        this.x = width / 2;
+        this.y = height / 2;
+        this.speed = 5;
+        this.xSpeed = this.speed;
+        this.ySpeed = 0;
+        this.size = 10;
+    };
+
+    Ball.prototype.move = function () {
+        this.x += this.xSpeed;
+        this.y += this.ySpeed;
+
+        // if (this.x < 0) {
+        //     this.x = width;
+        // } else if (this.x > width) {
+        //     this.x = 0;
+        // }
+        // if (this.y < 0) {
+        //     this.y = height;
+        // } else if (this.y > height) {
+        //     this.y = 0;
+        // }
+
+        if (this.x < 0 || this.x > width) {
+            this.xSpeed *= -1;
+        }
+        if (this.y < 0 || this.y > height) {
+            this.ySpeed *= -1;
+        }
+    };
+
+    Ball.prototype.draw = function (direction) {
+        if (direction === "small") {
+            this.size--;
+            if (this.size < 0) {
+                this.size = 0;
+            }
+        } else if (direction === "big") {
+            this.size++;
+            if (this.size > 50) {
+                this.size = 50;
+            }
+        }
+        circle(this.x, this.y, this.size, "fill");
+    }
+
+    Ball.prototype.setDirection = function (direction) {
+        if (direction === "up") {
+            this.xSpeed = 0;
+            this.ySpeed = -this.speed;
+        } else if (direction === "down") {
+            this.xSpeed = 0;
+            this.ySpeed = this.speed;
+        } else if (direction === "left") {
+            this.xSpeed = -this.speed;
+            this.ySpeed = 0;
+        } else if (direction === "right") {
+            this.xSpeed = this.speed;
+            this.ySpeed = 0;
+        } else if (direction === "space") {
+            this.xSpeed = 0;
+            this.ySpeed = 0;
+        }
+
+        if (direction > 0 && direction < 10) {
+            if (this.xSpeed > 0) {
+                this.xSpeed = direction;
+            } else if (this.xSpeed < 0) {
+                this.xSpeed = -direction;
+            } else if (this.ySpeed > 0) {
+                this.ySpeed = direction;
+            } else if (this.ySpeed < 0) {
+                this.ySpeed = -direction;
+            }
+            this.speed = direction;
+        }
+
+        if (direction === "low") {
+            if (this.xSpeed > 0) {
+                this.xSpeed--;
+            } else if (this.xSpeed < 0) {
+                this.xSpeed++;
+            } else if (this.ySpeed > 0) {
+                this.ySpeed--;
+            } else if (this.ySpeed < 0) {
+                this.ySpeed++
+            }
+            this.speed--;
+            if (this.speed < 1) {
+                this.speed = 1;
+            }
+        } else if (direction === "height") {
+            if (this.xSpeed > 0) {
+                this.xSpeed++;
+            } else if (this.xSpeed < 0) {
+                this.xSpeed--;
+            } else if (this.ySpeed > 0) {
+                this.ySpeed++;
+            } else if (this.ySpeed < 0) {
+                this.ySpeed--;
+            }
+            this.speed++;
+        }
+    }
+
+    var keyActions = {
+        32: "space",
+        37: "left",
+        38: "up",
+        39: "right",
+        40: "down",
+        49: 1,
+        50: 2,
+        51: 3,
+        52: 4,
+        53: 5,
+        54: 6,
+        55: 7,
+        56: 8,
+        57: 9,
+        90: "low",
+        88: "height",
+        67: "small",
+        86: "big"
+    };
+
+
+    var ball = new Ball();
+
+    $("body").keydown(function (event) {
+        var direction = keyActions[event.keyCode];
+        ball.setDirection(direction);
+        ball.draw(direction);
+    });
+
+    var intervalId = setInterval(function () {
+        ctx.clearRect(0, 0, width, height);
+        ball.draw();
+        ball.move();
+        ctx.strokeRect(0, 0, width, height);
+    }, 30);
+
+    $("body").keydown(function (event) {
+        console.log(event.keyCode);
+    });
+</script>
+</body>
+</html>
